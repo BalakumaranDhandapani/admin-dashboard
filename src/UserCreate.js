@@ -1,7 +1,12 @@
+import axios from 'axios';
 import { useFormik } from 'formik';
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function UserCreate() {
+  const [isLoading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const myFormik = useFormik(
     {
       initialValues: {
@@ -44,7 +49,17 @@ function UserCreate() {
         return errors;
       },
       //one can be able to submit once the validates returns empty value (validation successful) else can't be submitted
-      onSubmit: (values) => {
+      onSubmit: async (values) => {
+        try {
+          setLoading(true);
+          await axios.post("https://63a9bccb7d7edb3ae616b639.mockapi.io/users", values);
+          navigate("/portal/user-list");
+        } catch (error) {
+          console.log(error);
+          alert("Validation failed");
+          setLoading(false);
+        }
+
         console.log(values);
       }
 
@@ -110,11 +125,11 @@ function UserCreate() {
           </div>
 
           <div className='col-lg-4 mt-3'>
-            <input type="submit" value="Create" className=' btn btn-primary' />
+            <input disabled={isLoading} type="submit" value={isLoading ? "Submitting..." : "Create"} className=' btn btn-primary' />
           </div>
         </div>
       </form>
-      {JSON.stringify(myFormik.values)}
+      {/* {JSON.stringify(myFormik.values)} */}
     </div>
   );
 }
